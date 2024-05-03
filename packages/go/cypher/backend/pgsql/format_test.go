@@ -560,7 +560,7 @@ func Suite() []TestCase {
 			Expected: "update node as s set properties = properties || @p0, kind_ids = kind_ids || @p1 returning (s.id, s.kind_ids, s.properties)::nodeComposite as s",
 		},
 		{
-			ID:       161,
+			ID:      161,
 			Source:   "match (s) where s:NodeKindA set s.name = 'new name' return s",
 			Expected: "update node as s set properties = properties || @p0 where s.kind_ids operator(pg_catalog.&&) array[1]::int2[] returning (s.id, s.kind_ids, s.properties)::nodeComposite as s",
 		},

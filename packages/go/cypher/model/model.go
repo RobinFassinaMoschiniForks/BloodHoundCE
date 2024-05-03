@@ -41,7 +41,8 @@ func (s AssignmentOperator) String() string {
 	return string(s)
 }
 
-type Expression any
+type SyntaxNode any
+type Expression SyntaxNode
 
 type ExpressionList interface {
 	Add(expression Expression)
@@ -772,6 +773,10 @@ func (s MapLiteral) Keys() []any {
 
 type ListLiteral []Expression
 
+func (s *ListLiteral) Expressions() []Expression {
+	return *s
+}
+
 func NewListLiteral() *ListLiteral {
 	return &ListLiteral{}
 }
@@ -942,6 +947,14 @@ func (s *FunctionInvocation) copy() *FunctionInvocation {
 		Name:      s.Name,
 		Arguments: Copy(s.Arguments),
 	}
+}
+
+func (s *FunctionInvocation) NumArguments() int {
+	return len(s.Arguments)
+}
+
+func (s *FunctionInvocation) HasArguments() bool {
+	return len(s.Arguments) > 0
 }
 
 func (s *FunctionInvocation) AddArgument(arg Expression) {

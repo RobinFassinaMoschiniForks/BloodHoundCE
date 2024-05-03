@@ -17,10 +17,11 @@
 package pg
 
 import (
-	"bytes"
 	"context"
 	"github.com/specterops/bloodhound/cypher/backend/pgsql"
 	"github.com/specterops/bloodhound/cypher/backend/pgsql/pgtransition"
+	"github.com/specterops/bloodhound/cypher/models/pgsql/format"
+	"github.com/specterops/bloodhound/cypher/models/pgsql/translate"
 	"github.com/specterops/bloodhound/dawgs/graph"
 	"github.com/specterops/bloodhound/dawgs/query"
 )
@@ -59,16 +60,14 @@ func (s *liveQuery) runAllShortestPathsQuery() graph.Result {
 }
 
 func (s *liveQuery) runRegularQuery() graph.Result {
-	buffer := &bytes.Buffer{}
-
 	if regularQuery, err := s.queryBuilder.Build(); err != nil {
 		return graph.NewErrorResult(err)
-	} else if arguments, err := pgsql.Translate(regularQuery, s.kindMapper); err != nil {
+	} else if translated, err := translate.Translate(regularQuery, s.kindMapper, false); err != nil {
 		return graph.NewErrorResult(err)
-	} else if err := s.emitter.Write(regularQuery, buffer); err != nil {
+	} else if sqlQuery, err := format.SyntaxNode(translated.Statement); err != nil {
 		return graph.NewErrorResult(err)
 	} else {
-		return s.tx.Raw(buffer.String(), arguments)
+		return s.tx.Raw(sqlQuery, translated.Parameters)
 	}
 }
 

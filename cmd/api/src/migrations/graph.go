@@ -110,6 +110,7 @@ func (s *GraphMigrator) getMigrationData() (version.Version, error) {
 		}).First(); err != nil {
 			return err
 		}
+
 		return nil
 	}); err != nil {
 		return currentMigration, err
